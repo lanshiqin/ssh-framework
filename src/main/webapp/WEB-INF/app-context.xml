@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <description>Spring 配置</description>
+
+    <!-- 加载外部配置文件 -->
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <!-- 如果有多个配置文件可以用多个value标签进行配置 -->
+                <value>classpath:db.properties</value>
+            </list>
+        </property>
+    </bean>
+
+    <!-- 配置数据源 dataSource -->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <!-- 配置连接池基础信息：连接驱动、连接地址、用户名、密码 -->
+        <property name="driverClass" value="${jdbc.driverClass}"/>
+        <property name="jdbcUrl" value="${jdbc.url}"/>
+        <property name="user" value="${jdbc.user}"/>
+        <property name="password" value="${jdbc.password}"/>
+
+        <!-- 初始化连接池连接数大小，默认值为3 -->
+        <property name="initialPoolSize" value="${initialPoolSize}"/>
+
+        <!-- 最大空闲时间，为0则永不丢弃，默认值为0 -->
+        <property name="maxIdleTime" value="${maxIdleTime}"/>
+
+        <!-- 连接池的最大连接数，默认最大值为15 -->
+        <property name="maxPoolSize" value="${maxPoolSize}"/>
+
+        <!-- 连接池中保持的最小连接数，默认值为3 -->
+        <property name="minPoolSize" value="${minPoolSize}"/>
+
+        <!-- 更多配置以及默认值可查看c3p0依赖库中的 com.mchange.v2.c3p0.impl.C3P0Defaults类 -->
+    </bean>
+
+    <!-- 配置会话工厂 SessionFactory -->
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+        <!--配置数据源-->
+        <property name="dataSource" ref="dataSource"/>
+        <!--配置 Hibernate属性-->
+        <property name="hibernateProperties">
+            <props>
+                <!-- hibernate 方言 -->
+                <prop key="hibernate.dialect">${hibernate.dialect}</prop>
+                <prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
+                <prop key="hibernate.format_sql">${hibernate.format_sql}</prop>
+                <prop key="hibernate.hbm2ddl.auto">${hibernate.hbm2ddl.auto}</prop>
+            </props>
+        </property>
+        <!-- 配置要扫描的包路径 -->
+        <property name="packagesToScan" value="com.lanshiqin.*.entity"/>
+    </bean>
+
+    <!-- 配置事物管理 transactionManager -->
+    <bean id="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+        <!-- 配置 SessionFactory -->
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+
+    <!-- 配置事务，使事务注解生效 默认属性值 transaction-manager="transactionManager"，因为上面配置了预定的默认名称，故此处可省略 -->
+    <tx:annotation-driven/>
+
+</beans>

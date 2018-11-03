@@ -1,0 +1,33 @@
+<web-app>
+  <display-name>SSH 框架整合</display-name>
+
+  <!-- 配置Spring的监听器，Spring 容器启动时默认会加载 WEB-INF 目录下的 applicationContext.xml 文件 -->
+  <listener>
+    <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+  </listener>
+
+  <!--当 WEB-INF 目录下的 applicationContext.xml 文件不存在时，一定要指定自定义名称的配置文件-->
+  <!-- 定义自定义名称的 Spring 上下文配置文件-->
+  <context-param>
+    <param-name>contextConfigLocation</param-name>
+    <param-value>WEB-INF/app-context.xml</param-value>
+  </context-param>
+
+  <!--配置 Spring MVC 的 servlet 拦截器-->
+  <servlet>
+    <servlet-name>app</servlet-name>
+    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+    <!--配置初始化时要加载的自定义配置文件，如果不配置则默认为 WEB-INF 目录下的 app-servlet.xml 文件-->
+    <init-param>
+      <param-name>contextConfigLocation</param-name>
+      <param-value>WEB-INF/app-webmvc.xml</param-value>
+    </init-param>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
+  <!-- 配置servlet映射所匹配的url -->
+  <servlet-mapping>
+    <servlet-name>app</servlet-name>
+    <url-pattern>/</url-pattern>
+  </servlet-mapping>
+</web-app>
